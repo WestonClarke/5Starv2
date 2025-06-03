@@ -1,0 +1,122 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User model - Extended from Clerk
+model User {
+  id                String            @id @default(uuid())
+  clerkId           String            @unique
+  email             String            @unique
+  firstName         String?
+  lastName          String?
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  businessProfiles  BusinessProfile[]
+  reviewRequests    ReviewRequest[]
+}
+
+// Business Profile model
+model BusinessProfile {
+  id                String            @id @default(uuid())
+  name              String
+  description       String?
+  address           String?
+  phone             String?
+  website           String?
+  logo              String?
+  preferredLanguage String            @default("en")
+  userId            String
+  user              User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reviewSources     ReviewSource[]
+  reviewRequests    ReviewRequest[]
+  reviewLinks       ReviewLink[]
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+}
+
+// Review Source model - Connections to review platforms
+model ReviewSource {
+  id                String          @id @default(uuid())
+  platform          String          // e.g., "google", "yelp"
+  platformId        String?         // ID from the platform
+  accessToken       String?
+  refreshToken      String?
+  expiresAt         DateTime?
+  businessProfileId String
+  businessProfile   BusinessProfile @relation(fields: [businessProfileId], references: [id], onDelete: Cascade)
+  reviews           Review[]
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  @@unique([businessProfileId, platform])
+}
+
+// Review model
+model Review {
+  id              String        @id @default(uuid())
+  externalId      String?       // ID from the review platform
+  reviewerName    String?
+  reviewerAvatar  String?
+  text            String?
+  language        String        @default("en")
+  rating          Float
+  platform        String        // e.g., "google", "yelp"
+  reviewSourceId  String
+  source          ReviewSource  @relation(fields: [reviewSourceId], references: [id], onDelete: Cascade)
+  sentimentScore  Float?        // Score from sentiment analysis
+  sentimentLabel  String?       // "positive", "negative", "neutral"
+  keywords        String?       // JSON array of keywords
+  isReplied       Boolean       @default(false)
+  replyText       String?
+  replyDate       DateTime?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  externalPostDate DateTime?    // Date the review was posted on the platform
+}
+
+// Review Request model
+model ReviewRequest {
+  id                String          @id @default(uuid())
+  userId            String
+  user              User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  businessProfileId String
+  businessProfile   BusinessProfile @relation(fields: [businessProfileId], references: [id], onDelete: Cascade)
+  contactName       String?
+  contactEmail      String?
+  contactPhone      String?
+  method            String          // "email" or "sms"
+  language          String          @default("en")
+  templateId        String          @default("default")
+  status            String          @default("pending") // "pending", "sent", "failed", "clicked"
+  message           String?
+  reviewLink        ReviewLink?     @relation(fields: [reviewLinkId], references: [id])
+  reviewLinkId      String?
+  sentAt            DateTime?
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+}
+
+// Review Link model
+model ReviewLink {
+  id                String          @id @default(uuid())
+  slug              String          @unique
+  businessProfileId String
+  businessProfile   BusinessProfile @relation(fields: [businessProfileId], references: [id], onDelete: Cascade)
+  platform          String?         // If specific to a platform
+  clicks            Int             @default(0)
+  reviewRequests    ReviewRequest[]
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+}
