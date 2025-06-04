@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
 import { MobileNav } from './MobileNav';
-import NavLinks from './NavLinks';
+import { NavLinks } from './NavLinks';
 
 export function Header() {
   return (

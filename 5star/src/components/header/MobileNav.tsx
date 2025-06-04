@@ -3,90 +3,119 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
-import NavLinks from './NavLinks';
+import { publicLinks } from './NavLinks';
+
+// Define the link type
+type NavLink = {
+  name: string;
+  href: string;
+};
 
 export function MobileNav() {
   const [isOpen, setIsOpen] = useState(false);
-
+  
   return (
     <div className="md:hidden">
-      {/* Mobile menu button */}
+      {/* Hamburger button */}
       <button
-        type="button"
-        className="inline-flex items-center justify-center rounded-md p-2 text-gray-700 hover:bg-gray-100 hover:text-gray-900"
-        aria-controls="mobile-menu"
-        aria-expanded="false"
         onClick={() => setIsOpen(!isOpen)}
+        className="flex h-9 w-9 items-center justify-center rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
+        aria-label={isOpen ? "Close menu" : "Open menu"}
       >
-        <span className="sr-only">Open main menu</span>
-        {/* Icon when menu is closed */}
         <svg
-          className={`${isOpen ? 'hidden' : 'block'} h-6 w-6`}
+          className="h-6 w-6"
           fill="none"
-          viewBox="0 0 24 24"
-          strokeWidth="1.5"
           stroke="currentColor"
-          aria-hidden="true"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
-          />
-        </svg>
-        {/* Icon when menu is open */}
-        <svg
-          className={`${isOpen ? 'block' : 'hidden'} h-6 w-6`}
-          fill="none"
           viewBox="0 0 24 24"
-          strokeWidth="1.5"
-          stroke="currentColor"
-          aria-hidden="true"
+          xmlns="http://www.w3.org/2000/svg"
         >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M6 18L18 6M6 6l12 12"
-          />
+          {isOpen ? (
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M6 18L18 6M6 6l12 12"
+            />
+          ) : (
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M4 6h16M4 12h16M4 18h16"
+            />
+          )}
         </svg>
       </button>
 
       {/* Mobile menu */}
       {isOpen && (
-        <div className="absolute left-0 right-0 top-16 z-50 bg-white border-b shadow-lg">
-          <div className="space-y-1 px-4 py-4">
-            <div className="flex flex-col space-y-4">
-              <NavLinks />
-              
+        <div className="fixed inset-0 z-50 bg-white pt-16">
+          <div className="p-4">
+            <div className="absolute right-4 top-4">
+              <button
+                onClick={() => setIsOpen(false)}
+                className="flex h-9 w-9 items-center justify-center rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
+              >
+                <svg
+                  className="h-6 w-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+
+            <nav className="flex flex-col space-y-4">
+              {publicLinks.map((link: NavLink) => (
+                <Link
+                  key={link.name}
+                  href={link.href}
+                  className="rounded-md py-2 text-base font-medium text-gray-900 hover:bg-gray-50"
+                  onClick={() => setIsOpen(false)}
+                >
+                  {link.name}
+                </Link>
+              ))}
+
               <SignedIn>
-                <div className="pt-4 border-t flex items-center justify-between">
-                  <Link
-                    href="/dashboard"
-                    className="rounded-md bg-blue-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-600"
-                  >
-                    Dashboard
-                  </Link>
+                <Link
+                  href="/dashboard"
+                  className="rounded-md bg-blue-600 px-4 py-2 text-base font-medium text-white hover:bg-blue-500"
+                  onClick={() => setIsOpen(false)}
+                >
+                  Dashboard
+                </Link>
+                <div className="py-2 flex items-center">
+                  <span className="mr-2">Account:</span>
                   <UserButton afterSignOutUrl="/" />
                 </div>
               </SignedIn>
-              
+
               <SignedOut>
-                <div className="pt-4 border-t flex flex-col space-y-4">
-                  <Link
-                    href="/sign-in"
-                    className="w-full rounded-md border border-gray-300 px-3.5 py-2.5 text-center text-sm font-semibold text-gray-900 shadow-sm hover:bg-gray-50"
-                  >
-                    Sign in
-                  </Link>
-                  <Link
-                    href="/sign-up"
-                    className="w-full rounded-md bg-blue-600 px-3.5 py-2.5 text-center text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-600"
-                  >
-                    Get started
-                  </Link>
-                </div>
+                <Link
+                  href="/sign-in"
+                  className="rounded-md py-2 text-base font-medium text-gray-900 hover:bg-gray-50"
+                  onClick={() => setIsOpen(false)}
+                >
+                  Sign in
+                </Link>
+                <Link
+                  href="/sign-up"
+                  className="rounded-md bg-blue-600 px-4 py-2 text-base font-medium text-white hover:bg-blue-500"
+                  onClick={() => setIsOpen(false)}
+                >
+                  Get started
+                </Link>
               </SignedOut>
-            </div>
+            </nav>
           </div>
         </div>
       )}
