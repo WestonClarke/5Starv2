@@ -1,12 +1,12 @@
 import Link from 'next/link';
 
 const navigation = {
-  solutions: [
-    { name: 'Beauty Salons', href: '/solutions#beauty' },
-    { name: 'Auto Repair', href: '/solutions#auto' },
-    { name: 'Dental Clinics', href: '/solutions#dental' },
-    { name: 'Pet Groomers', href: '/solutions#pet' },
-    { name: 'Fitness Centers', href: '/solutions#fitness' },
+  customers: [
+    { name: 'Beauty Salons', href: '/customers#beauty' },
+    { name: 'Restaurants', href: '/customers#restaurants' },
+    { name: 'Pet Services', href: '/customers#pet' },
+    { name: 'Fitness Centers', href: '/customers#fitness' },
+    { name: 'Small Retail', href: '/customers#retail' },
   ],
   support: [
     { name: 'Getting Started', href: '/support/getting-started' },
@@ -74,9 +74,9 @@ export function Footer() {
           <div className="mt-16 grid grid-cols-2 gap-8 xl:col-span-2 xl:mt-0">
             <div className="md:grid md:grid-cols-2 md:gap-8">
               <div>
-                <h3 className="text-sm font-semibold leading-6 text-gray-900">Solutions</h3>
+                <h3 className="text-sm font-semibold leading-6 text-gray-900">Customers</h3>
                 <ul role="list" className="mt-6 space-y-4">
-                  {navigation.solutions.map((item) => (
+                  {navigation.customers.map((item) => (
                     <li key={item.name}>
                       <a href={item.href} className="text-sm leading-6 text-gray-600 hover:text-gray-900">
                         {item.name}

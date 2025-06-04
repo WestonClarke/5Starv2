@@ -5,7 +5,7 @@ import { SignedIn, SignedOut } from '@clerk/nextjs';
 
 const publicLinks = [
   { name: 'Features', href: '/features' },
-  { name: 'Solutions', href: '/solutions' },
+  { name: 'Customers', href: '/customers' },
   { name: 'Pricing', href: '/pricing' },
   { name: 'About', href: '/about' },
   { name: 'Blog', href: '/blog' },
