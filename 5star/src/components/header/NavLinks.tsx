@@ -3,9 +3,9 @@
 import Link from 'next/link';
 import { SignedIn, SignedOut } from '@clerk/nextjs';
 
-const publicLinks = [
+export const publicLinks = [
   { name: 'Features', href: '/features' },
-  { name: 'Solutions', href: '/solutions' },
+  { name: 'Customers', href: '/customers' },
   { name: 'Pricing', href: '/pricing' },
   { name: 'About', href: '/about' },
   { name: 'Blog', href: '/blog' },
@@ -21,7 +21,7 @@ const authenticatedLinks = [
   { name: 'Settings', href: '/settings' },
 ];
 
-export default function NavLinks() {
+export function NavLinks() {
   return (
     <>
       <SignedOut>
@@ -29,7 +29,7 @@ export default function NavLinks() {
           <Link
             key={link.name}
             href={link.href}
-            className="text-sm font-medium text-gray-700 hover:text-gray-900"
+            className="text-sm font-semibold text-gray-700 hover:text-gray-900"
           >
             {link.name}
           </Link>

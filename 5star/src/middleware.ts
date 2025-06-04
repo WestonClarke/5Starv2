@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
 const isPublicRoute = createRouteMatcher([
   "/",
   "/features",
-  "/solutions",
+  "/customers",
   "/pricing",
   "/about",
   "/blog",
@@ -14,6 +14,16 @@ const isPublicRoute = createRouteMatcher([
   "/api/webhooks/:path*",
   "/sign-in",
   "/sign-up",
+]);
+
+// Define routes that are part of the dashboard (authenticated)
+const isDashboardRoute = createRouteMatcher([
+  "/dashboard",
+  "/reviews",
+  "/analytics",
+  "/requests",
+  "/integrations",
+  "/settings",
 ]);
 
 // Export the middleware with configuration
@@ -29,15 +39,31 @@ export default clerkMiddleware(async (auth, req) => {
     return NextResponse.next();
   }
 
-  // Protect all routes except public ones
-  if (!isPublicRoute(req)) {
-    await auth.protect();
+  // Use the auth() method to get authentication state
+  const { userId } = await auth();
+  const isAuthenticated = !!userId;
+
+  // If trying to access dashboard routes while not authenticated
+  if (isDashboardRoute(req) && !isAuthenticated) {
+    return NextResponse.redirect(new URL("/sign-in", req.url));
   }
+
+  // If authenticated and trying to access public pages, redirect to dashboard
+  if (isAuthenticated && isPublicRoute(req) && pathname !== "/") {
+    return NextResponse.redirect(new URL("/dashboard", req.url));
+  }
+
+  // For other routes, use the default protection logic
+  if (!isPublicRoute(req) && !isAuthenticated) {
+    return NextResponse.redirect(new URL("/sign-in", req.url));
+  }
+
+  return NextResponse.next();
 });
 
 export const config = {
   matcher: [
-    "/:path*",
-    "/api/:path*",
+    '/((?!_next/static|_next/image|favicon.ico).*)',
+    '/api/:path*'
   ],
 }; 
